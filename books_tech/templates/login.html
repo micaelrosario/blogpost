@@ -7,7 +7,7 @@
 </head>
 <body>
     {% block conteudo %}
-        <form action="{% url 'fazerLogin' %}" method="post">{% csrf_token %}
+        <form action="{% url 'login' %}" method="post">{% csrf_token %}
             <input type="text" name="username" placeholder="Usuário">
             <input type="text" name="password" placeholder="Senha">
             <button> Login </button>

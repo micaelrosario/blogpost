@@ -6,6 +6,16 @@
     <title>Books Tech</title>
 </head>
 <body>
-    <h1>Bem vindo a página inicial do blog!</h1>
+{% block conteudo %}
+
+    {% if usuario.is_authenticated %}
+        <h1>Bem vindo {{usuario.username}}, a página inicial do blog!</h1>
+        <button><a href="{% url 'logout' %}">Logout</a></button>
+    {% else %}
+        <h1>Você não está logado!</h1>
+        <button><a href="{% url 'login' %}">Login</a></button>
+    {% endif %}
+
+{% endblock conteudo %}
 </body>
 </html>
