@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-f1ulu^eh5v1)7tm0p@h6-&=$5f!t3o@0tvl^(q=*)rnbh+uu18
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['micaelrosario.pythonanywhere.com']
+ALLOWED_HOSTS = ['micaelrosario.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -52,7 +52,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "devblog.urls"
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -74,16 +73,27 @@ WSGI_APPLICATION = "devblog.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+import os
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'micaelrosario$default',
-        'USER': 'micaelrosario',
-        'PASSWORD': '@DevRosario',
-        'HOST': 'micaelrosario.mysql.pythonanywhere-services.com',
+# Use SQLite locally when DEBUG=True to avoid requiring mysqlclient during
+# development. In production (DEBUG=False) the original MySQL settings are used.
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'micaelrosario$default',
+            'USER': 'micaelrosario',
+            'PASSWORD': '@DevRosario',
+            'HOST': 'micaelrosario.mysql.pythonanywhere-services.com',
+        }
+    }
 
 
 
@@ -128,9 +138,15 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# default static files settings for PythonAnywhere.
-# see https://help.pythonanywhere.com/pages/DjangoStaticFiles for more info
-MEDIA_ROOT = '/home/micaelrosario/devblog/media'
+# Static and media settings
 MEDIA_URL = '/media/'
-STATIC_ROOT = '/home/micaelrosario/devblog/static'
 STATIC_URL = '/static/'
+
+# Use local media/static directories during development
+if DEBUG:
+    MEDIA_ROOT = BASE_DIR / 'media'
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
+else:
+    # Production (PythonAnywhere) paths
+    MEDIA_ROOT = '/home/micaelrosario/devblog/media'
+    STATIC_ROOT = '/home/micaelrosario/devblog/static'
