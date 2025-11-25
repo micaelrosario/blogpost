@@ -138,6 +138,9 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Use custom user model from books_tech app
+AUTH_USER_MODEL = 'books_tech.Usuario'
+
 # Static and media settings
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
