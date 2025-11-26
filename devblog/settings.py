@@ -138,8 +138,10 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Use custom user model from books_tech app
-AUTH_USER_MODEL = 'books_tech.Usuario'
+# NOTE: removed custom user model setting during cleanup to avoid
+# reference to a non-existent model after simplifying the app.
+# If you want a custom user model, restore this setting and the
+# corresponding model from the backup branch.
 
 # Static and media settings
 MEDIA_URL = '/media/'
