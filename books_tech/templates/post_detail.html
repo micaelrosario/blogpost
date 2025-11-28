@@ -1,26 +1,28 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ post.titulo }}</title>
-    <link rel="stylesheet" href="{% static 'books_tech/css/home.css' %}">
-</head>
-<body>
-    <div class="container">
-        <article class="card">
+
+{% block title %}{{ post.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <article class="card m-2">
+        <div class="card-body">
             {% if post.imagem %}
-                <div class="card-image"><img src="{{ post.imagem.url }}" alt="{{ post.titulo }}"></div>
+            <div class="card-image"><img src="{{ post.imagem.url }}" alt="{{ post.titulo }}"
+                    style="max-width: 200px; max-height: 400px;"></div>
             {% endif %}
-            <div class="card-body">
-                <h1>{{ post.titulo }}</h1>
-                {% load tz %}
-                {% load date_filters %}
-                <p class="meta">{{ post.criado_em|pretty_date }} — {{ post.autor }}</p>
-                <div>{{ post.conteudo|linebreaks }}</div>
-            </div>
-        </article>
-    </div>
-</body>
-</html>
+            <h1 class="py-1">{{ post.titulo }}</h1>
+            {% load tz %}
+            {% load date_filters %}
+            <p class="meta">{{ post.criado_em|pretty_date }} — {{ post.autor }}</p>
+            <div>{{ post.conteudo|linebreaks }}</div>
+        </div>
+    </article>
+    <a href="{% url 'books_tech:home_view' %}" class="btn btn-secondary m-2 text-light">
+        Voltar
+    </a>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    crossorigin="anonymous"></script>
+{% endblock %}

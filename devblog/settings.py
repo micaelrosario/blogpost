@@ -138,6 +138,11 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# NOTE: removed custom user model setting during cleanup to avoid
+# reference to a non-existent model after simplifying the app.
+# If you want a custom user model, restore this setting and the
+# corresponding model from the backup branch.
+
 # Static and media settings
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'

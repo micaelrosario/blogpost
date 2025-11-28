@@ -1,13 +1,10 @@
 from django.urls import path
-from . import views
-
+from .views import HomeView, PostDetailView
 
 app_name = 'books_tech'
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('post/<int:pk>/', views.post_detail, name='post_detail'),
-    path('category/<int:pk>/', views.category_posts, name='category_posts'),
-    path('login/', views.login, name='login'),
-    path('logout/', views.logout, name='logout'),
+    #path('', views.home_view, name='home_view'),
+    path('', HomeView.as_view(), name='home_view'),
+    path('post/<int:pk>/', PostDetailView.as_view(), name='post_detail'),
 ]

@@ -1,4 +1,4 @@
-{% load static %}
+{% raw %}{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -22,7 +22,7 @@
                         {% load date_filters %}
                         <p class="meta">{{ post.criado_em|pretty_date }} — {{ post.autor }}</p>
                         <p>{{ post.conteudo|truncatechars:140 }}</p>
-                        <a class="read-more" href="{% url 'books_tech:post_detail' post.pk %}">Leia mais</a>
+                        <a class="read-more" href="{% url 'books_tech:detalhes_post' post.pk %}">Leia mais</a>
                     </div>
                 </article>
             {% empty %}
@@ -32,3 +32,4 @@
     </div>
 </body>
 </html>
+{% endraw %}
