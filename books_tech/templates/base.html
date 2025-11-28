@@ -1,58 +1,41 @@
 <!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Meu Blog{% endblock %}</title>
+    <title>{% block title %}My Developer' Blog{% endblock %}</title>
 
     <!-- Bootstrap CSS -->
-    <link 
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" 
-        rel="stylesheet"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
     <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-            <div class="container">
-                <a class="navbar-brand" href="{% url 'books_tech:home_view' %}">Books Tech</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse sticky-top" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="#about">Sobre mim</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#categories">Categorias</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contact">Contato</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary opacity-0">
-            <div class="container">
-                <a class="navbar-brand" href="{% url 'books_tech:home_view' %}">Books Tech</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse sticky-top" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="#about">Sobre mim</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#categories">Categorias</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contact">Contato</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-3" style="background-color: #e3f2fd;">
+        <a class="navbar-brand" href="{% url 'books_tech:home_view' %}">My Developer' Blog</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto ">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#"> Categorias</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"> Mais Vendidos</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
     {% block content %}
     {% endblock %}
 
     <!-- Bootstrap JS -->
-    <script 
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
     </script>
 </body>
+
 </html>
