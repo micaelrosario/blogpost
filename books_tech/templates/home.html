@@ -23,10 +23,10 @@
             {% for post in posts %}
             <a href="{% url 'books_tech:post_detail' post.pk %}" class="text-decoration-none">
                 {% if post.imagem %}<img class="py-2" src="{{ post.imagem.url }}" alt="{{ post.titulo }}" style="max-width: 200px; max-height: 400px;">{% else %}Sem imagem{% endif %} <br>
-                {{ post.titulo }} - {{ post.autor.first_name }} <br>
+                {{ post.titulo }}</a> - {{ post.autor.first_name}} - <a href="{% url 'books_tech:update_post' post.pk %}">( Editar )</a><br>
                 {{ post.conteudo|truncatechars:250 }}<br>
                 {{ post.criado_em }} <br><br>
-                </a>
+                
             {% endfor%}
         </ul>
     </header>

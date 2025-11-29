@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .models import Post
 from django.views.generic import ListView, DetailView, CreateView , UpdateView, DeleteView
+from .forms import PostForm, EditForm, ClearableFileInput
 
 
 #def home_view(request):
@@ -21,14 +22,14 @@ class PostDetailView(DetailView):
 
 class PostCreateView(CreateView):
     model = Post
+    form_class = PostForm
     template_name = 'add_post.html'
-    fields = '__all__'
     success_url = '/'  
 
 class PostUpdateView(UpdateView):
     model = Post
     template_name = 'update_post.html'
-    fields = '__all__'
+    form_class = EditForm 
     success_url = '/'  
 
 class PostDeleteView(DeleteView):
