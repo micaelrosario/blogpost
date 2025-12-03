@@ -14,7 +14,11 @@
             <h1 class="py-1">{{ post.titulo }}</h1>
             {% load tz %}
             {% load date_filters %}
-            <p class="meta">{{ post.criado_em|pretty_date }} — {{ post.autor }} — <a href="{% url 'books_tech:update_post' post.pk %}"> Editar </a></p>
+            <p class="meta">{{ post.criado_em|pretty_date }} — {{ post.autor }} — <a href="{% url 'books_tech:update_post' post.pk %}"> Editar </a>  -  
+            
+            <a href="{% url 'books_tech:delete_post' post.pk %}" class="text-danger"> Deletar </a>
+            
+            </p>
             <div>{{ post.conteudo|linebreaks }}</div>
         </div>
     </article>

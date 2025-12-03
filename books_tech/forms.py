@@ -1,6 +1,8 @@
 from django import forms
 from django.forms.widgets import ClearableFileInput
-from .models import Post
+from .models import Post, Usuario, Categoria, Comentario, PerfilAutor
+from django.contrib.auth.forms import AuthenticationForm
+from django import forms
 
 
 # Widget que remove o texto "Currently:" exibido por padrão
@@ -31,4 +33,55 @@ class EditForm(forms.ModelForm):
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título do Post'}),
             'conteudo': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Conteúdo do Post'}),
             'imagem': CustomClearableFileInput(attrs={'class': 'form-control-file'}),
+        }
+
+#----------------------------------------------------------------------------------
+
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Usuário'})
+    )
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Senha'})
+    )
+
+#----------------------------------------------------------------------------------
+
+class CategoriaForm(forms.ModelForm):
+    class Meta:
+        model = Categoria
+        fields = ['nome']
+
+        widgets = {
+            'nome': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nome da categoria'
+            }),
+        }
+
+
+#----------------------------------------------------------------------------------
+
+class ComentarioForm(forms.ModelForm):
+    class Meta:
+        model = Comentario
+        fields = ['texto']
+
+        widgets = {
+            'texto': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Escreva um comentário...'
+            })
+        }
+#----------------------------------------------------------------------------------
+
+class PerfilAutorForm(forms.ModelForm):
+    class Meta:
+        model = PerfilAutor
+        fields = ['bio', 'foto', 'redes_sociais']
+        widgets = {
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'rows':4, 'placeholder': 'Escreva uma bio curta...'}),
+            'redes_sociais': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://seusite.com'}),
         }
