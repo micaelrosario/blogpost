@@ -25,11 +25,18 @@
                     <a class="nav-link" href="{% url 'books_tech:add_post' %}"> Nova Postagem</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"> Mais Vendidos</a>
+                    <a class="nav-link" href="{% url 'books_tech:add_categoria' %}"> Nova Categoria</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-end">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}"> Login</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}"> Cadastrar</a>
+                    <a class="nav-link" href="{% url 'register' %}"> Register</a>
                 </li>
+            <ul>
+
             </ul>
         </div>
     </nav>

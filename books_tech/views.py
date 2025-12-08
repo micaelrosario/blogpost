@@ -74,14 +74,9 @@ class CustomLoginView(LoginView):
 class CategoriaCreateView(CreateView):
     model = Categoria
     form_class = CategoriaForm
-    template_name = 'categoria_form.html'
-    success_url = reverse_lazy('books_tech:categoria_list')
+    template_name = 'add_categoria.html'
+    success_url = '/'  
 
-
-class CategoriaListView(ListView):
-    model = Categoria
-    template_name = 'categoria_list.html'
-    context_object_name = 'categorias'  
 
 
 #----------------------------------------------------------------------------------
@@ -90,7 +85,7 @@ class PerfilAutorCreateView(CreateView):
     model = PerfilAutor
     template_name = 'perfil_autor_form.html'
     fields = ['bio', 'foto', 'redes_sociais']
-    success_url = reverse_lazy('books_tech:home')
+    success_url = '/'  
 
     def form_valid(self, form):
         form.instance.usuario = self.request.user
@@ -112,7 +107,7 @@ class ComentarioCreateView(CreateView):
     model = Comentario
     template_name = 'comentario_form.html'
     fields = ['texto']
-    success_url = reverse_lazy('books_tech:home')
+    success_url = '/'  
 
     def form_valid(self, form):
         form.instance.autor = self.request.user

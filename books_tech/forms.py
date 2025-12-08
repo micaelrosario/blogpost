@@ -14,6 +14,11 @@ class CustomClearableFileInput(ClearableFileInput):
 # ------------------------------
 # FORM PARA POST
 # ------------------------------
+
+choices = Categoria.objects.all().values_list('nome', 'nome')
+choice_list = []
+for item in choices:
+    choice_list.append(item)
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
@@ -22,7 +27,7 @@ class PostForm(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título do Post'}),
             'autor': forms.Select(attrs={'class': 'form-control'}),
-            'categorias': forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'categorias': forms.Select(choices=choice_list,attrs={'class': 'form-control'}),
             'conteudo': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Conteúdo do Post'}),
             'imagem': CustomClearableFileInput(attrs={'class': 'form-control-file'}),
         }

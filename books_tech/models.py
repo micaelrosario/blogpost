@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 class Post(models.Model):
     titulo = models.CharField(max_length=200)
     autor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    categorias = models.ManyToManyField('Categoria', related_name="posts")
+    categorias = models.ManyToManyField('Categoria', related_name="posts", default='coding')
     conteudo = models.TextField()
     imagem = models.ImageField(upload_to='posts/', null=True, blank=True)
     criado_em = models.DateTimeField(auto_now_add=True)
