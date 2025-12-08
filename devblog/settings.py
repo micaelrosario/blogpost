@@ -32,14 +32,17 @@ ALLOWED_HOSTS = ['micaelrosario.pythonanywhere.com', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'books_tech',  # custom user model app needs to load before auth/admin
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'books_tech',
+    "members",
 ]
+
+# Use default Django User model (auth.User)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -155,3 +158,7 @@ else:
     # Production (PythonAnywhere) paths
     MEDIA_ROOT = '/home/micaelrosario/devblog/media'
     STATIC_ROOT = '/home/micaelrosario/devblog/static'
+
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'

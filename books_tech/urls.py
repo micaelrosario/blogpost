@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import HomeView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView, CustomLoginView
+from .views import HomeView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView, CustomLoginView, CategoriaCreateView, CategoriaListView, PerfilAutorCreateView, UsuarioUpdateView, ComentarioCreateView, ComentarioDeleteView
 
 app_name = 'books_tech'
 

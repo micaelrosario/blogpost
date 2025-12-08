@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+
+    <!-- Bootstrap 5 -->
+    <link 
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+        rel="stylesheet"
+    >
+
+    <style>
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        textarea,
+        select {
+            max-width: 100%;
+        }
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            margin: 0.25rem 0;
+        }
+        .errorlist li {
+            color: #dc3545;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <main class="d-flex justify-content-center align-items-center vh-100 m-4">
+
+        <div class="card shadow p-4 m-4" style="width: 350px;">
+
+            <h2 class="text-center mb-4">Cadastrar</h2>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Usuário -->
+                <div class="mb-3">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">Usuário</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.username.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Senha -->
+                <div class="mb-3">
+                    <label for="{{ form.password1.id_for_label }}" class="form-label">Senha</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.password1.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Confirmação de Senha -->
+                <div class="mb-3">
+                    <label for="{{ form.password2.id_for_label }}" class="form-label">Confirme sua Senha</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.password2.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Cadastrar
+                </button>
+
+            </form>
+
+            <p class="text-center mt-3">
+                Já tem conta? <a href="{% url 'login' %}">Faça login</a>
+            </p>
+
+        </div>
+
+    </main>
+
+    <script>
+        // Adicionar classe Bootstrap aos inputs do formulário
+        document.querySelectorAll('input[type="text"], input[type="password"], input[type="email"], textarea, select').forEach(el => {
+            if (!el.classList.contains('btn')) {
+                el.classList.add('form-control');
+            }
+        });
+    </script>
+
+</body>
+</html>

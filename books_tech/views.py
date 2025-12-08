@@ -1,17 +1,15 @@
-from django.shortcuts import render
-from .models import Post, Usuario
-from django.views.generic import ListView, DetailView, CreateView , UpdateView, DeleteView
-from .forms import PostForm, EditForm, ClearableFileInput
+from django.shortcuts import render, redirect
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.models import User
+from .forms import PostForm, EditForm, ClearableFileInput, LoginForm, CategoriaForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import LoginForm
 from django.urls import reverse_lazy
-from .models import Categoria
-from .forms import CategoriaForm
+from .models import Post, Categoria, PerfilAutor, Comentario
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
 
-#def home_view(request):
-#    return render(request, 'home.html')
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -27,23 +25,39 @@ class PostDetailView(DetailView):
     template_name = 'post_detail.html'
     context_object_name = 'post'
 
-
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'add_post.html'
     success_url = '/'  
+    login_url = '/login/'
 
-class PostUpdateView(UpdateView):
+class PostUpdateView(LoginRequiredMixin, UpdateView):
     model = Post
     template_name = 'update_post.html'
     form_class = EditForm 
     success_url = '/'  
+    login_url = '/login/'
 
-class PostDeleteView(DeleteView):
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        # se só o autor pode editar:
+        if obj.autor != self.request.user:
+            raise PermissionDenied("Você não pode editar este post.")
+        return obj
+
+class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
-    template_name = 'delete_post.html'
+    template_name = 'delete_post.html'  # não será usada se você só enviar POST
     success_url = '/'
+    login_url = '/login/'
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        # se só o autor pode deletar:
+        if obj.autor != self.request.user:
+            raise PermissionDenied("Você não pode deletar este post.")
+        return obj
 
 #--------------------------------------------------------------------------
 
@@ -62,3 +76,63 @@ class CategoriaCreateView(CreateView):
     form_class = CategoriaForm
     template_name = 'categoria_form.html'
     success_url = reverse_lazy('books_tech:categoria_list')
+
+
+class CategoriaListView(ListView):
+    model = Categoria
+    template_name = 'categoria_list.html'
+    context_object_name = 'categorias'  
+
+
+#----------------------------------------------------------------------------------
+
+class PerfilAutorCreateView(CreateView):
+    model = PerfilAutor
+    template_name = 'perfil_autor_form.html'
+    fields = ['bio', 'foto', 'redes_sociais']
+    success_url = reverse_lazy('books_tech:home')
+
+    def form_valid(self, form):
+        form.instance.usuario = self.request.user
+        return super().form_valid(form)
+
+#----------------------------------------------------------------------------------
+
+class UsuarioUpdateView(UpdateView):
+    model = User
+    template_name = 'usuario_form.html'
+    fields = ['username', 'email', 'first_name', 'last_name']
+    success_url = reverse_lazy('books_tech:home')
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+#----------------------------------------------------------------------------------
+class ComentarioCreateView(CreateView):
+    model = Comentario
+    template_name = 'comentario_form.html'
+    fields = ['texto']
+    success_url = reverse_lazy('books_tech:home')
+
+    def form_valid(self, form):
+        form.instance.autor = self.request.user
+        form.instance.post_id = self.kwargs['post_id']
+        return super().form_valid(form)
+
+#----------------------------------------------------------------------------------
+class ComentarioDeleteView(DeleteView):
+    model = Comentario
+    template_name = 'comentario_confirm_delete.html'
+    success_url = reverse_lazy('books_tech:home')
+
+    def get_object(self, queryset=None):
+        comentario = super().get_object(queryset)
+        if comentario.autor != self.request.user:
+            raise PermissionDenied("Você não tem permissão para deletar este comentário.")
+        return comentario
+
+#----------------------------------------------------------------------------------
+
+def logout_view(request):
+    logout(request)
+    return redirect('books_tech:login')
