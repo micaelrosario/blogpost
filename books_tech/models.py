@@ -46,3 +46,11 @@ class PerfilAutor(models.Model):
     bio = models.TextField()
     foto = models.ImageField(upload_to="autores/")
     redes_sociais = models.URLField(blank=True, null=True)
+
+
+class Usuario(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username

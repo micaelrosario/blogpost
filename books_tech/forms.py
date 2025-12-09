@@ -96,7 +96,6 @@ class PerfilAutorForm(forms.ModelForm):
             'redes_sociais': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://seusite.com'}),
         }
 
-
 #----------------------------------------------------------------------------------
 class UsuarioForm(forms.ModelForm):
     class Meta:

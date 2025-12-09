@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.models import User
-from .forms import PostForm, EditForm, ClearableFileInput, LoginForm, CategoriaForm
+from .forms import PostForm, EditForm, ClearableFileInput, LoginForm, CategoriaForm, PerfilAutorForm, ComentarioForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -95,6 +95,7 @@ class CategoriaCreateView(CreateView):
 
 class PerfilAutorCreateView(CreateView):
     model = PerfilAutor
+    form_class = PerfilAutorForm
     template_name = 'perfil_autor_form.html'
     fields = ['bio', 'foto', 'redes_sociais']
     success_url = '/'  
@@ -105,16 +106,21 @@ class PerfilAutorCreateView(CreateView):
 
 
 #----------------------------------------------------------------------------------
-class ComentarioCreateView(CreateView):
+
+
+class AddComentarioView(LoginRequiredMixin, CreateView):
     model = Comentario
-    template_name = 'comentario_form.html'
-    fields = ['texto']
-    success_url = '/'  
+    form_class = ComentarioForm
+    template_name = 'post_detail.html'
+    login_url = '/login/'
 
     def form_valid(self, form):
         form.instance.autor = self.request.user
         form.instance.post_id = self.kwargs['post_id']
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.post.get_absolute_url()
 
 #----------------------------------------------------------------------------------
 class ComentarioDeleteView(DeleteView):
