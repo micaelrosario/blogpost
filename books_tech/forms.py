@@ -22,12 +22,12 @@ for item in choices:
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['titulo', 'autor', 'categorias', 'conteudo', 'imagem']
+        fields = ['titulo', 'autor', 'categoria', 'conteudo', 'imagem']
 
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título do Post'}),
             'autor': forms.Select(attrs={'class': 'form-control'}),
-            'categorias': forms.Select(choices=choice_list,attrs={'class': 'form-control'}),
+            'categoria': forms.Select(choices=choice_list,attrs={'class': 'form-control'}),
             'conteudo': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Conteúdo do Post'}),
             'imagem': CustomClearableFileInput(attrs={'class': 'form-control-file'}),
         }

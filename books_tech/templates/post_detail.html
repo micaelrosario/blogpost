@@ -14,10 +14,15 @@
             <h1 class="py-1">{{ post.titulo }}</h1>
             {% load tz %}
             {% load date_filters %}
-            <p class="meta">{{ post.criado_em|pretty_date }} — {{ post.autor }} — <a href="{% url 'books_tech:update_post' post.pk %}"> Editar </a>  -  
-            
-            <a href="{% url 'books_tech:delete_post' post.pk %}" class="text-danger"> Deletar </a>
-            
+            <p class="meta">{{ post.criado_em|pretty_date }} — {{ post.autor }} — <a
+                    href="{% url 'books_tech:update_post' post.pk %}"> Editar </a> -
+
+                <a href="{% url 'books_tech:delete_post' post.pk %}" class="text-danger"> Deletar </a>
+                {% if request.GET.delete_error %}
+            <div class="alert alert-danger mt-3 text-center">
+                Você não pode deletar este post.
+            </div>
+            {% endif %}
             </p>
             <div>{{ post.conteudo|linebreaks }}</div>
         </div>

@@ -16,7 +16,7 @@
 
     <main class="d-flex justify-content-center align-items-center vh-100">
 
-        <div class="card shadow p-4" style="width: 350px;">
+        <div class="card shadow p-5" style="width: 350px;">
 
             <h2 class="text-center mb-4">Entrar</h2>
 
@@ -24,17 +24,18 @@
                 {% csrf_token %}
 
                 <!-- Usuário -->
-                <div class="mb-3">
+                <div class="mb-3 py-2">
                     <label class="form-label">Usuário</label>
                     {{ form.username }}
                     {% for e in form.username.errors %}
                         <div class="text-danger small">{{ e }}</div>
                     {% endfor %}
                 </div>
+                
 
                 <!-- Senha -->
-                <div class="mb-3">
-                    <label class="form-label">Senha</label>
+                <div class="mb-3 py-2">
+                    <label class="form-label mx-1">Senha</label>
                     {{ form.password }}
                     {% for e in form.password.errors %}
                         <div class="text-danger small">{{ e }}</div>
@@ -46,6 +47,10 @@
                 </button>
 
             </form>
+
+            <p class="text-center mt-3">
+                Não tem uma conta? <a href="{% url 'register' %}"><br>Faça o Cadastro</a>
+            </p>
 
         </div>
 

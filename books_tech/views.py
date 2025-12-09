@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.models import User
 from .forms import PostForm, EditForm, ClearableFileInput, LoginForm, CategoriaForm
@@ -9,6 +9,8 @@ from django.urls import reverse_lazy
 from .models import Post, Categoria, PerfilAutor, Comentario
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 
@@ -46,18 +48,33 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
             raise PermissionDenied("Você não pode editar este post.")
         return obj
 
-class PostDeleteView(LoginRequiredMixin, DeleteView):
+'''class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
-    template_name = 'delete_post.html'  # não será usada se você só enviar POST
     success_url = '/'
     login_url = '/login/'
 
+    def get(self, request, *args, **kwargs):
+        # Bloqueia GET
+        raise PermissionDenied("Use POST para deletar o post.")
+
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        # se só o autor pode deletar:
         if obj.autor != self.request.user:
             raise PermissionDenied("Você não pode deletar este post.")
-        return obj
+        return obj'''
+
+
+@login_required
+def delete_post_direct(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    if post.autor != request.user:
+        return redirect(f"{post.get_absolute_url()}?delete_error=1")
+
+    post.delete()
+    return redirect('/')
+
+
 
 #--------------------------------------------------------------------------
 
