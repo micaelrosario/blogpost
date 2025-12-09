@@ -5,8 +5,6 @@
 
 <body>
     <header>
-
-
         <!-- Sessão -->
         <div class="bg-light py-5">
             <div class="container">
@@ -19,33 +17,34 @@
                 </div>
             </div>
         </div>
-        <ul class="py-3">
+        <div >
             {% for post in posts %}
-            <a href="{% url 'books_tech:post_detail' post.pk %}" class="text-decoration-none">
-                {% if post.imagem %}<img class="py-2" src="{{ post.imagem.url }}" alt="{{ post.titulo }}"
-                    style="max-width: 200px; max-height: 400px;">{% else %}Sem imagem{% endif %} <br>
-                {{ post.titulo }}</a> {{ post.autor.first_name}} -
+                <div class="border rounded p-3 mb-4 bg-white mx-4">
+                    <a href="{% url 'books_tech:post_detail' post.pk %}" class="text-decoration-none">
+                        {% if post.imagem %}<img class="py-2" src="{{ post.imagem.url }}" alt="{{ post.titulo }}"
+                            style="max-width: 200px; max-height: 400px;">{% else %}Sem imagem{% endif %} <br>
+                        {{ post.titulo }}</a> - {{ post.autor.first_name}} {{ post.autor.last_name}} <br>
 
-            <a href="{% url 'books_tech:update_post' post.pk %}" class="btn btn-secondary btn-sm">
-                Editar</a> -
-
-            <a href="{% url 'books_tech:delete_post' post.pk %}" class="btn btn-danger btn-sm">
-                Deletar </a>
-            <br>
-            {% if messages %}
-            <div class="container mt-3">
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} text-center">
-                    {{ message }}
+                    <div class="d-flex gap-2 my-2">
+                        {% if post.autor == request.user %}
+                            <a href="{% url 'books_tech:update_post' post.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                            <a href="{% url 'books_tech:delete_post' post.pk %}" class="btn btn-danger btn-sm">Apagar</a>
+                        {% endif %}
+                    </div>
+                    {% if messages %}
+                        <div class="container mt-3">
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} text-center">
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {{ post.conteudo|truncatechars:250 }}<br>
+                    {{ post.criado_em }} <br>
                 </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            {{ post.conteudo|truncatechars:250 }}<br>
-            {{ post.criado_em }} <br><br>
-
-            {% endfor%}
-        </ul>
+            {% endfor %}
+        </div>
     </header>
 
 

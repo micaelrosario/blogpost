@@ -43,25 +43,20 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        # se só o autor pode editar:
+
         if obj.autor != self.request.user:
-            raise PermissionDenied("Você não pode editar este post.")
+            return redirect(f"{obj.get_absolute_url()}?edit_error=1")
+
         return obj
 
-'''class PostDeleteView(LoginRequiredMixin, DeleteView):
-    model = Post
-    success_url = '/'
-    login_url = '/login/'
+    def dispatch(self, request, *args, **kwargs):
+        result = self.get_object()
 
-    def get(self, request, *args, **kwargs):
-        # Bloqueia GET
-        raise PermissionDenied("Use POST para deletar o post.")
+        if hasattr(result, 'status_code'): 
+            return result
 
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        if obj.autor != self.request.user:
-            raise PermissionDenied("Você não pode deletar este post.")
-        return obj'''
+        self.object = result
+        return super().dispatch(request, *args, **kwargs)
 
 
 @login_required
@@ -108,16 +103,6 @@ class PerfilAutorCreateView(CreateView):
         form.instance.usuario = self.request.user
         return super().form_valid(form)
 
-#----------------------------------------------------------------------------------
-
-class UsuarioUpdateView(UpdateView):
-    model = User
-    template_name = 'usuario_form.html'
-    fields = ['username', 'email', 'first_name', 'last_name']
-    success_url = reverse_lazy('books_tech:home')
-
-    def get_object(self, queryset=None):
-        return self.request.user
 
 #----------------------------------------------------------------------------------
 class ComentarioCreateView(CreateView):

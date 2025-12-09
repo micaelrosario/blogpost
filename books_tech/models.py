@@ -32,13 +32,13 @@ class Categoria(models.Model):
 
 
 class Comentario(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='comentarios', on_delete=models.CASCADE)
     autor = models.ForeignKey(User, on_delete=models.CASCADE)
     texto = models.TextField()
     criado_em = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Comentário de {self.autor}"
+        return '%s - %s' % (self.post.titulo, self.autor.username)
 
 
 class PerfilAutor(models.Model):
