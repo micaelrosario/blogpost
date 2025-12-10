@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Perfil do Autor{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    <a href="{% url 'books_tech:home_view' %}" class="btn btn-secondary mb-3 text-light">Voltar</a>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card shadow-sm p-4 text-center">
+                <h3 class="mb-4">Perfil do Autor</h3>
+
+                <!-- Foto -->
+                {% if perfil.foto %}
+                    <img src="{{ perfil.foto.url }}"
+                         class="rounded-circle mb-3"
+                         style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                    <img src="{% static 'books_tech/img/icon_image.png' %}"
+                         class="rounded-circle mb-3"
+                         style="width: 150px; height: 150px; object-fit: cover;">
+                {% endif %}
+
+                <!-- Nome do usuário -->
+                <h4 class="fw-bold">{{ perfil.user.username }}</h4>
+
+                <!-- Bio -->
+                <p class="mt-3" style="text-align: justify;">
+                    {% if perfil.bio %}
+                        {{ perfil.bio }}
+                    {% else %}
+                        <em>Este autor ainda não escreveu uma biografia.</em>
+                    {% endif %}
+                </p>
+
+                <!-- Redes Sociais -->
+                <p>
+                    <strong>Redes Sociais:</strong><br>
+                    {% if perfil.redes_sociais %}
+                        {{ perfil.redes_sociais }}
+                    {% else %}
+                        <em>Nenhuma rede social informada.</em>
+                    {% endif %}
+                </p>
+
+                <a href="{% url 'books_tech:edit_author_profile' %}" 
+                   class="btn btn-primary mt-3">Editar Perfil</a>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -97,14 +97,16 @@ class PerfilAutorCreateView(CreateView):
     model = PerfilAutor
     form_class = PerfilAutorForm
     template_name = 'perfil_autor_form.html'
-    fields = ['bio', 'foto', 'redes_sociais']
     success_url = '/'  
 
     def form_valid(self, form):
         form.instance.usuario = self.request.user
         return super().form_valid(form)
 
-
+class PerfilAutorProfile(DetailView):
+    model = PerfilAutor
+    template_name = 'author_profile.html'
+    context_object_name = 'perfil_autor'
 #----------------------------------------------------------------------------------
 
 
