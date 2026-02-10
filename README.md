@@ -1,66 +1,85 @@
-# Blogpost (Django)
+# 📚 Blogpost
 
-Este repositório contém um projeto Django minimalista para um blog pessoal (app principal `books_tech`).
-O objetivo é uma base limpa com uma página `home.html` e instruções para você recriar funcionalidades (Post, Usuário customizado, uploads, admin, etc.).
-# blogpost
+Um blog moderno e funcional construído com Django. Publique posts, organize por categorias, interaja com comentários e gerencie seu perfil de autor.
 
- é um projeto para criar, editar e publicar posts de blog de forma simples e organizada. Este README fornece visão geral, instruções de instalação, uso, desenvolvimento e contribuição para que você e outras pessoas possam trabalhar no repositório com facilidade.
+## ⚡ Quick Start
 
-## Descrição
-Uma aplicação para gerenciar conteúdo de blog (criação, edição, exclusão, listagem e publicação de posts). Pode ser um site estático, SPA ou uma aplicação full‑stack dependendo da implementação. Este README serve como base e pode ser adaptado ao seu stack (por exemplo: Node.js + Express, Next.js, Gatsby, Hugo, Jekyll, etc).
-# Blogpost (Django)
+```bash
+# Ativar ambiente virtual
+source virt/Scripts/activate  # Windows
+# ou
+source virt/bin/activate      # Linux/Mac
 
-Este repositório contém um projeto Django minimalista para um blog pessoal (app principal `books_tech`).
-O objetivo é uma base limpa com uma página `home.html` e instruções para você recriar funcionalidades (Post, Usuário customizado, uploads, admin, etc.).
+# Instalar dependências
+pip install -r requirements.txt
 
-**Resumo**
- - Projeto Django mínimo para um blog pessoal.
- - App principal: `books_tech` (versão reduzida; arquivos antigos em `books_tech/backup/`).
- - Objetivo atual: manter apenas a homepage funcionando e permitir que você releia ou restaure recursos a partir do backup.
+# Executar migrações
+python manage.py migrate
 
----
+# Criar superuser
+python manage.py createsuperuser
 
-Visão geral
- - Propósito: servir como base didática para aprender Django construindo um blog.
- - Estado atual: projeto simplificado; backup completo em `books_tech/backup/` e branch `cleanup-home-only`.
+# Rodar servidor
+python manage.py runserver
+```
 
----
+Acesse http://localhost:8000
 
-**Contents**
- - `devblog/` — projeto Django (settings, urls, wsgi)
- - `books_tech/` — app principal (atualmente reduzido)
- - `books_tech/backup/` — cópia completa dos arquivos removidos
-# Blogpost (Django)
+## 🎯 Funcionalidades
 
-Breve
-- Projeto Django mínimo para um blog pessoal; atualmente reduzido para servir apenas a homepage.
-- Arquivos antigos e versões anteriores estão preservados em `books_tech/backup/` e na branch `cleanup-home-only`.
+- ✅ **Autenticação**: Login e cadastro de usuários
+- ✅ **Posts**: Criar, editar, deletar e publicar posts
+- ✅ **Categorias**: Organizador posts por tópicos
+- ✅ **Comentários**: Interagir nos posts com comentários
+- ✅ **Perfil de Autor**: Página de perfil com foto e bio
+- ✅ **Imagens**: Upload de imagens para posts e perfil
+- ✅ **Admin**: Painel de admin para gerenciar conteúdo
+- ✅ **Timezone**: Horários exibidos em São Paulo (America/Sao_Paulo)
+- ✅ **Idioma**: Interface em português
 
-Estrutura
-- `devblog/` — arquivo de configuração do projeto
-- `books_tech/` — app principal (reduzido)
-- `books_tech/backup/` — arquivos removidos preservados
-- `virt/` — virtualenv (opcional)
+## 📂 Estrutura
 
-Uso (resumo)
-- Ative seu ambiente virtual e instale dependências, se houver.
-- Execute migrações e rode o servidor de desenvolvimento para ver a homepage localmente.
+```
+blogpost/
+├── devblog/           # Configuração do projeto
+├── books_tech/        # App principal (blog)
+├── members/           # App de autenticação
+├── static/            # CSS, JS, imagens
+├── media/             # Uploads de usuários
+├── templates/         # Templates HTML
+├── db.sqlite3         # Banco de dados
+└── manage.py          # CLI do Django
+```
 
-Observações importantes
-- Defina `AUTH_USER_MODEL` antes de executar migrações que criem referências ao usuário. Alterações posteriores podem exigir reset do banco e das migrações.
-- Se usar um user model customizado, garanta `related_name` exclusivos para campos ManyToMany ligados a `Group` e `Permission` para evitar colisões.
+## 🔧 Tecnologias
 
-Backups e branches
-- Branch de segurança: `cleanup-home-only`.
-- Restaure arquivos individuais copiando do diretório `books_tech/backup/` quando necessário.
+- **Django 5.1.3** - Framework web
+- **Python 3.13** - Linguagem
+- **Bootstrap 5.3.8** - CSS framework
+- **SQLite** - Banco de dados (dev)
 
-Próximos passos sugeridos
-- Restaurar ou criar o modelo `Post` e aplicar migrações.
-- Registrar `Post` no admin e criar um superuser.
-- Adicionar suporte a uploads apenas se necessário.
+## 👨‍💻 Desenvolvedor
 
-Contribuição e licença
-- Use branches por feature e commits pequenos.
-- Adicione um arquivo `LICENSE` (ex.: MIT) se pretende compartilhar o projeto.
+Para adicionar novas features:
 
-Se quiser, eu gero um checklist conciso para o próximo passo que escolher (restaurar do backup ou criar apps novos).
+1. Crie uma branch: `git checkout -b feature/minha-feature`
+2. Faça suas mudanças
+3. Teste localmente
+4. Envie um pull request
+
+## 📝 Variáveis de Ambiente
+
+Configure em `devblog/settings.py`:
+
+- `DEBUG` - Modo debug (True para desenvolvimento)
+- `SECRET_KEY` - Chave secreta do Django
+- `TIME_ZONE` - Fuso horário (padrão: America/Sao_Paulo)
+- `LANGUAGE_CODE` - Idioma (padrão: pt-br)
+
+## 🚀 Deploy
+
+Para produção, consulte a documentação do Django sobre:
+- Configurar `DEBUG = False`
+- Usar MySQL em vez de SQLite
+- Configurar variáveis de ambiente
+- Setup de servidor (Gunicorn, Nginx, etc)
