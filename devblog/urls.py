@@ -19,10 +19,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.defaults import page_not_found
+
+# Handler personalizado para erro 404
+def custom_404(request, exception=None):
+    from django.shortcuts import render
+    return render(request, '404.html', status=404)
+
+handler404 = custom_404
 
 urlpatterns = [
-    path('', include('books_tech.urls')),
     path("admin/", admin.site.urls),
+    path('', include('books_tech.urls')),
+    path('members/', include('django.contrib.auth.urls')),
+    path('members/', include('members.urls')),
+
 ]
 
 if settings.DEBUG:
