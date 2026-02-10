@@ -2,12 +2,14 @@
 {% load static %}
 
 {% block content %}
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ category.nome }}</title>
     <link rel="stylesheet" href="{% static 'books_tech/css/home.css' %}">
 </head>
+
 <body>
     <header>
         <!-- Sessão -->
@@ -16,7 +18,8 @@
                 <div class="row align-items-center">
                     <div class="col-lg-8 text-dark">
                         <h2 class="display-6">Descubra livros e insights sobre tecnologia</h2>
-                        <p class="lead">Resenhas, guias práticos e reflexões para desenvolvedores e leitores ávidos —
+                        <p class="lead">Resenhas, guias práticos e reflexões para desenvolvedores e leitores ávidos
+                            —
                             novos posts toda semana.</p>
                     </div>
                 </div>
@@ -58,6 +61,7 @@
             </style>
         {% endif %}
         <div class="container my-4">
+            <h1 class="display-5 text-dark py-5 mb-4">{{ category.nome }}</h1>
             {% for post in posts %}
                 <div class="border rounded p-3 mb-4 bg-white mx-4">
                     <a href="{% url 'books_tech:post_detail' post.pk %}" class="text-decoration-none">
@@ -89,9 +93,6 @@
             {% endfor %}
         </div>
     </header>
-
-
-
     <script src="{% static 'books_tech/js/nav.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"

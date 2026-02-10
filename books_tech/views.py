@@ -21,11 +21,39 @@ class HomeView(LoginRequiredMixin, ListView):
     template_name = 'home.html'
     context_object_name = 'posts'
 
+@login_required(login_url='/login/')
+def CategoryView(request, category_name):
+    from django.utils.text import slugify
+    
+    # Busca a categoria comparando os slugs
+    all_categories = Categoria.objects.all()
+    category = None
+    
+    for cat in all_categories:
+        if slugify(cat.nome) == category_name:
+            category = cat
+            break
+    
+    if category:
+        posts = Post.objects.filter(categoria=category).order_by('-criado_em')
+        return render(request, 'categoria_posts.html', {'posts': posts, 'category': category})
+    else:
+        return render(request, '404.html', status=404)
 
-class PostDetailView(DetailView):
+class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
     template_name = 'post_detail.html'
     context_object_name = 'post'
+    login_url = '/login/'
+
+    def get(self, request, *args, **kwargs):
+        from django.http import Http404
+        try:
+            self.object = self.get_object()
+            context = self.get_context_data(object=self.object)
+            return self.render_to_response(context)
+        except Http404:
+            return render(request, '404.html', status=404)
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
@@ -45,17 +73,18 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
         obj = super().get_object(queryset)
 
         if obj.autor != self.request.user:
-            return redirect(f"{obj.get_absolute_url()}?edit_error=1")
+            messages.error(self.request, 'Você não tem permissão para editar este post.')
+            return None
 
         return obj
 
     def dispatch(self, request, *args, **kwargs):
-        result = self.get_object()
+        obj = self.get_object()
 
-        if hasattr(result, 'status_code'): 
-            return result
+        if obj is None:
+            return redirect('books_tech:home_view')
 
-        self.object = result
+        self.object = obj
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -64,17 +93,19 @@ def delete_post_direct(request, pk):
     post = get_object_or_404(Post, pk=pk)
 
     if post.autor != request.user:
-        return redirect(f"{post.get_absolute_url()}?delete_error=1")
+        messages.error(request, 'Você não tem permissão para apagar este post.')
+        return redirect('books_tech:home_view')
 
     post.delete()
-    return redirect('/')
+    messages.success(request, 'Post apagado com sucesso!')
+    return redirect('books_tech:home_view')
 
 
 
 #--------------------------------------------------------------------------
 
 class CustomLoginView(LoginView):
-    template_name = 'login.html'
+    template_name = 'registration/login.html'
     authentication_form = LoginForm
     #redirect_authenticated_user = True
 
@@ -83,30 +114,49 @@ class CustomLoginView(LoginView):
     
 #----------------------------------------------------------------------------------
 
-class CategoriaCreateView(CreateView):
+class CategoriaCreateView(LoginRequiredMixin, CreateView):
     model = Categoria
     form_class = CategoriaForm
     template_name = 'add_categoria.html'
-    success_url = '/'  
+    success_url = '/'
+    login_url = '/login/'  
 
 
 
 #----------------------------------------------------------------------------------
 
-class PerfilAutorCreateView(CreateView):
+class PerfilAutorCreateView(LoginRequiredMixin, CreateView):
     model = PerfilAutor
     form_class = PerfilAutorForm
     template_name = 'perfil_autor_form.html'
-    success_url = '/'  
+    success_url = '/'
+    login_url = '/login/'  
 
     def form_valid(self, form):
         form.instance.usuario = self.request.user
         return super().form_valid(form)
 
-class PerfilAutorProfile(DetailView):
+class PerfilAutorProfile(LoginRequiredMixin, DetailView):
     model = PerfilAutor
     template_name = 'author_profile.html'
     context_object_name = 'perfil_autor'
+    login_url = '/login/'
+
+    def get_object(self, queryset=None):
+        """Retorna o perfil do autor do usuário atual."""
+        try:
+            return PerfilAutor.objects.get(usuario=self.request.user)
+        except PerfilAutor.DoesNotExist:
+            # Se não existir perfil, redireciona para criar
+            messages.info(self.request, 'Você ainda não tem um perfil de autor. Crie um agora!')
+            return None
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object is None:
+            return redirect('books_tech:perfil_autor')
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 #----------------------------------------------------------------------------------
 
 
@@ -125,16 +175,29 @@ class AddComentarioView(LoginRequiredMixin, CreateView):
         return self.object.post.get_absolute_url()
 
 #----------------------------------------------------------------------------------
-class ComentarioDeleteView(DeleteView):
+class ComentarioDeleteView(LoginRequiredMixin, DeleteView):
     model = Comentario
-    template_name = 'comentario_confirm_delete.html'
-    success_url = reverse_lazy('books_tech:home')
+    login_url = '/login/'
+
+    def get_success_url(self):
+        # Redireciona de volta ao post após deletar o comentário
+        return self.object.post.get_absolute_url()
 
     def get_object(self, queryset=None):
         comentario = super().get_object(queryset)
         if comentario.autor != self.request.user:
-            raise PermissionDenied("Você não tem permissão para deletar este comentário.")
+            messages.error(self.request, 'Você não tem permissão para deletar este comentário.')
+            return None
         return comentario
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object is None:
+            return redirect('books_tech:home_view')
+        success_url = self.get_success_url()
+        self.object.delete()
+        messages.success(request, 'Comentário deletado com sucesso!')
+        return redirect(success_url)
 
 #----------------------------------------------------------------------------------
 

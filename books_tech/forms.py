@@ -36,10 +36,11 @@ class PostForm(forms.ModelForm):
 class EditForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['titulo', 'conteudo', 'imagem']
+        fields = ['titulo', 'categoria', 'conteudo', 'imagem']
 
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título do Post'}),
+            'categoria': forms.Select(choices=choice_list, attrs={'class': 'form-control'}),
             'conteudo': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Conteúdo do Post'}),
             'imagem': CustomClearableFileInput(attrs={'class': 'form-control-file'}),
         }
@@ -87,7 +88,7 @@ class ComentarioForm(forms.ModelForm):
 #----------------------------------------------------------------------------------
 
 class PerfilAutorForm(forms.ModelForm):
-    class Meta:
+    class Meta: 
         model = PerfilAutor
         fields = ['bio', 'foto', 'redes_sociais']
         widgets = {
