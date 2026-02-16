@@ -10,11 +10,31 @@
                     <h3 class="mb-0">Editar Perfil</h3>
                 </div>
                 <div class="card-body">
+                    <div class="alert alert-light border mb-4">
+                        <strong>Logado como:</strong> {{ request.user.username }}
+                    </div>
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <div class="mb-3">
-                            {{ form.as_p }}
+
+                        <h5 class="mb-3">Dados do usuário</h5>
+                        <div class="mb-4">
+                            {{ user_form.as_p }}
                         </div>
+
+                        <hr>
+
+                        <h5 class="mb-3">Perfil do autor</h5>
+
+                        {% if autor_form.instance.foto %}
+                            <div class="mb-3 text-center">
+                                <img src="{{ autor_form.instance.foto.url }}" class="rounded-circle" style="width: 140px; height: 140px; object-fit: cover;">
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            {{ autor_form.as_p }}
+                        </div>
+
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle me-1" viewBox="0 0 16 16">

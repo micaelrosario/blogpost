@@ -15,34 +15,31 @@ class CustomClearableFileInput(ClearableFileInput):
 # FORM PARA POST
 # ------------------------------
 
-choices = Categoria.objects.all().values_list('nome', 'nome')
-choice_list = []
-for item in choices:
-    choice_list.append(item)
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['titulo', 'autor', 'categoria', 'conteudo', 'imagem']
+        fields = ['titulo', 'categoria', 'conteudo', 'imagem', 'imagem_posicao']
 
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título do Post'}),
-            'autor': forms.Select(attrs={'class': 'form-control'}),
-            'categoria': forms.Select(choices=choice_list,attrs={'class': 'form-control'}),
+            'categoria': forms.Select(attrs={'class': 'form-control'}),
             'conteudo': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Conteúdo do Post'}),
             'imagem': CustomClearableFileInput(attrs={'class': 'form-control-file'}),
+            'imagem_posicao': forms.Select(attrs={'class': 'form-control'}),
         }
 
 #----------------------------------------------------------------------------------
 class EditForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['titulo', 'categoria', 'conteudo', 'imagem']
+        fields = ['titulo', 'categoria', 'conteudo', 'imagem', 'imagem_posicao']
 
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título do Post'}),
-            'categoria': forms.Select(choices=choice_list, attrs={'class': 'form-control'}),
+            'categoria': forms.Select(attrs={'class': 'form-control'}),
             'conteudo': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Conteúdo do Post'}),
             'imagem': CustomClearableFileInput(attrs={'class': 'form-control-file'}),
+            'imagem_posicao': forms.Select(attrs={'class': 'form-control'}),
         }
 
 #----------------------------------------------------------------------------------
@@ -94,7 +91,11 @@ class PerfilAutorForm(forms.ModelForm):
         widgets = {
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows':4, 'placeholder': 'Escreva uma bio curta...'}),
             'foto': CustomClearableFileInput(attrs={'class': 'form-control-file'}),
-            'redes_sociais': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://seusite.com'}),
+            'redes_sociais': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Cole uma URL por linha\nhttps://instagram.com/seuusuario\nhttps://github.com/seuusuario'
+            }),
         }
 
 #----------------------------------------------------------------------------------

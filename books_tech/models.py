@@ -9,6 +9,17 @@ class Post(models.Model):
     categoria = models.ForeignKey('Categoria', on_delete=models.SET_NULL, null=True)
     conteudo = models.TextField()
     imagem = models.ImageField(upload_to='posts/', null=True, blank=True)
+    imagem_posicao = models.CharField(
+        max_length=20,
+        choices=(
+            ('center', 'Centro'),
+            ('top', 'Topo'),
+            ('bottom', 'Base'),
+            ('left', 'Esquerda'),
+            ('right', 'Direita'),
+        ),
+        default='center',
+    )
     criado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -45,7 +56,11 @@ class PerfilAutor(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField()
     foto = models.ImageField(upload_to="autores/")
-    redes_sociais = models.URLField(blank=True, null=True)
+    redes_sociais = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Cole uma URL por linha (ex: Instagram, LinkedIn, GitHub).',
+    )
 
 
 class Usuario(models.Model):
