@@ -66,15 +66,13 @@
                 <div class="border rounded p-3 mb-4 bg-white mx-4">
                     <a href="{% url 'books_tech:post_detail' post.pk %}" class="text-decoration-none">
                         {% if post.imagem %}
-                            <img class="py-2" 
-                                src="{{ post.imagem.url }}" 
-                                alt="{{ post.titulo }}"
-                                style="max-width: 200px; max-height: 400px;">
+                            <div class="post-thumb mb-2">
+                                <img src="{{ post.imagem.url }}" alt="{{ post.titulo }}" style="--obj-pos: {{ post.imagem_posicao }};">
+                            </div>
                         {% else %}
-                            <img class="py-2" 
-                                src="{% static 'img/icon_image.png' %}" 
-                                alt="{{ post.titulo }}"
-                                style="max-width: 200px; max-height: 400px;">
+                            <div class="post-thumb mb-2">
+                                <img src="{% static 'img/icon_image.png' %}" alt="{{ post.titulo }}">
+                            </div>
                         {% endif %} <br>
                         {{ post.titulo }}</a>{% if post.categoria %} -
                         <a href="{% url 'books_tech:categoria_posts' post.categoria.nome|slugify %}">{{post.categoria.nome}}</a>{% endif %} <br>
