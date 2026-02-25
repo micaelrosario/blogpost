@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import HomeView, PostDetailView, PostCreateView, PostUpdateView, CustomLoginView, CategoriaCreateView, AddComentarioView, ComentarioDeleteView, ComentarioUpdateView, delete_post_direct, PerfilAutorProfile, CategoryView, logout_view, update_categoria, delete_categoria, perfil_autor_redirect
+from .views import HomeView, PostDetailView, PostCreateView, PostUpdateView, CustomLoginView, CategoriaCreateView, AddComentarioView, ComentarioDeleteView, ComentarioUpdateView, delete_post_direct, PerfilAutorProfile, CategoryView, logout_view, update_categoria, delete_categoria, perfil_autor_redirect, admin_panel, editarusuario
 
 app_name = 'books_tech'
 
@@ -20,6 +20,8 @@ urlpatterns = [
     path('perfil_autor/', perfil_autor_redirect, name='perfil_autor'),
     path("meu_perfil/", PerfilAutorProfile.as_view(), name="author_detail"),
     path('categoria/<str:category_name>/', CategoryView, name='categoria_posts'),
-
+    path('painel/', admin_panel, name='admin_panel'),
+    path('editarusuario/id/<int:id>/', editarusuario, name='editar_usuario'),
+    #path('excluirusuario/id/<int:pk>/', excluirusuario, name='excluir_usuario'),
 
 ]

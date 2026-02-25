@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.models import User
-from .forms import PostForm, EditForm, ClearableFileInput, LoginForm, CategoriaForm, PerfilAutorForm, ComentarioForm
+from .forms import PostForm, EditForm, UsuarioForm, LoginForm, CategoriaForm, PerfilAutorForm, ComentarioForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,6 +13,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import IntegrityError
 from urllib.parse import urlencode
+from django.contrib.auth.hashers import make_password  
+
 
 
 
@@ -141,6 +143,48 @@ class CustomLoginView(LoginView):
         return '/'
     
 #----------------------------------------------------------------------------------
+
+# me ajude criando o painel administrativo nesse arquivo views.py onde irei gerenciar as permissões que o usuário terá no site.
+def admin_panel(request):
+    context = {
+        'users': User.objects.all().order_by('username')
+    }
+    return render(request, 'painel_admin.html', context)
+
+
+def editarusuario(request, id):
+    usuario = User.objects.get(id=id)
+
+    context = {
+        'formUsuario': UsuarioForm(instance=usuario),
+        'id': id,
+        'permissions': usuario.get_all_permissions(),
+    }
+
+    if request.method == 'GET':
+        form = UsuarioForm(instance=usuario)
+        context['formUsuario'] = form
+    elif request.method == 'POST':
+        form = UsuarioForm(request.POST, instance=usuario)
+        if request.POST.get('password') == request.POST.get('confirm_password'):
+            form.fields['password'].widget = form.PasswordInput()
+            if form.is_valid():
+                user = form.save(commit=False)
+                user.password = make_password(user.password)
+                user.save()
+                messages.success(request, 'Usuário atualizado com sucesso!')
+                return redirect('books_tech:admin_panel')
+        else:
+            messages.error(request, 'Erro ao atualizar usuário. Verifique os dados informados.')
+    else:
+        messages.error(request, 'Método de requisição inválido.')
+    return render(request, 'editar_usuario.html', context)
+
+#----------------------------------------------------------------------------------
+
+
+
+
 
 class CategoriaCreateView(LoginRequiredMixin, CreateView):
     model = Categoria
