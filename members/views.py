@@ -41,15 +41,28 @@ class UserEditView(LoginRequiredMixin, View):
         user_form = UserUpdateForm(request.POST, instance=request.user)
         autor_form = PerfilAutorForm(request.POST, request.FILES, instance=perfil_autor)
 
-        if user_form.is_valid() and autor_form.is_valid():
+        user_ok = user_form.is_valid()
+        autor_ok = autor_form.is_valid()
+
+        if user_ok:
             user_form.save()
-            autor_instance = autor_form.save(commit=False)
-            autor_instance.usuario = request.user
-            autor_instance.save()
+
+        if autor_ok:
+            required_perm = 'books_tech.change_perfilautor' if perfil_autor else 'books_tech.add_perfilautor'
+            if request.user.has_perm(required_perm):
+                autor_instance = autor_form.save(commit=False)
+                autor_instance.usuario = request.user
+                autor_instance.save()
+            else:
+                autor_form.add_error(None, 'Você não tem permissão para editar o perfil de autor.')
+                messages.error(request, 'Você não tem permissão para editar o perfil de autor.')
+
+        if user_ok and autor_ok and not autor_form.errors:
             messages.success(request, 'Perfil atualizado com sucesso!')
             return redirect('edit_profile')
 
-        messages.error(request, 'Não foi possível atualizar o perfil. Verifique os campos e tente novamente.')
+        if not user_ok or not autor_ok:
+            messages.error(request, 'Não foi possível atualizar o perfil. Verifique os campos e tente novamente.')
         return render(request, self.template_name, {
             'user_form': user_form,
             'autor_form': autor_form,

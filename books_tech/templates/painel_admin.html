@@ -4,30 +4,39 @@
 {% block title %}Painel Administrativo{% endblock %}
 
 {% block content %}
+
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
+            {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             <div class="card shadow-sm p-4">
                 <h3 class="text-center mb-4">Bem-vindo ao Painel Administrativo</h3>
                 <table class="table">
-                    <th>
                     <thead>
-                        <tr>
-                            <th>username</th> 
+                        <tr class="fs-5">
+                            <th>Usuário</th> 
                             <th>Nome</th>
                             <th>Email</th>
                             <th>Ações</th>
-                            
                         </tr>
                     </thead>
                     <tbody>
                         {% for user in users %}
                         <tr>
-                            <td>{{ user.username }}</td>
+                            <td class="fs-6">{{ user.username }}</td>
                             <td>{{ user.first_name }} {{ user.last_name }}</td>
-                            <td>{{ user.email }}</td>
-                            <th> <a class="btn btn-warning" href="{% url 'books_tech:editar_usuario' user.id %}">Editar</a>
-                            <th> <a class="btn btn-danger" href="">Remover</a>
+                            <td>{{ user.email}}</td>
+                            <th> <a class="btn btn-warning btn-sm" href="{% url 'books_tech:editar_usuario' user.id %}">Editar</a>
+                            <th> <a class="btn btn-danger btn-sm" href="">Remover</a>
                         </tr>
                         {% endfor %}
                     </tbody>
