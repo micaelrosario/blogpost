@@ -81,10 +81,20 @@
                             {{ post.autor.first_name}} 
                             {{ post.autor.last_name}} 
                         <br>
-                    <div class="d-flex gap-2 my-2">
-                        <a href="{% url 'books_tech:update_post' post.pk %}" class="btn btn-primary btn-sm">Editar</a>
-                        <a href="{% url 'books_tech:delete_post' post.pk %}" class="btn btn-danger btn-sm">Apagar</a>
-                    </div>
+                    {% if user.is_authenticated %}
+                        {% if user.is_superuser or post.autor == user %}
+                            {% if perms.books_tech.change_post or perms.books_tech.delete_post %}
+                                <div class="d-flex gap-2 my-2">
+                                    {% if perms.books_tech.change_post %}
+                                        <a href="{% url 'books_tech:update_post' post.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                                    {% endif %}
+                                    {% if perms.books_tech.delete_post %}
+                                        <a href="{% url 'books_tech:delete_post' post.pk %}" class="btn btn-danger btn-sm">Apagar</a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
                     {{ post.conteudo|truncatechars:250 }}<br>
                     <small class="text-muted">{{ post.criado_em|date:"d/m/Y \à\s H:i" }}</small><br>
                 </div>

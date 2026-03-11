@@ -49,21 +49,30 @@
             <h1 class="py-1">{{ post.titulo }}</h1>
             {% load tz %}
             {% load date_filters %}
-            <p class="meta">{{ post.criado_em|pretty_date }} — {{ post.autor }} — <a
-                    href="{% url 'books_tech:update_post' post.pk %}" class="text-primary"> 
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                    </svg>
-                    Editar 
-                </a> -
+            <p class="meta">
+                {{ post.criado_em|pretty_date }} — {{ post.autor }}
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser or post.autor == user %}
+                        {% if perms.books_tech.change_post %}
+                            — <a href="{% url 'books_tech:update_post' post.pk %}" class="text-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                </svg>
+                                Editar
+                            </a>
+                        {% endif %}
 
-                <a href="{% url 'books_tech:delete_post' post.pk %}" class="text-danger"> 
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                    </svg>
-                    Deletar 
-                </a>
+                        {% if perms.books_tech.delete_post %}
+                            — <a href="{% url 'books_tech:delete_post' post.pk %}" class="text-danger">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                </svg>
+                                Deletar
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
             </p>
             <div>{{ post.conteudo|linebreaks }}</div>
         </div>
@@ -93,9 +102,14 @@
                                         <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                                         <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
                                     </svg>
-                                    {{ comentario.autor.first_name }} {{ comentario.autor.last_name }}
-                                    {% if not comentario.autor.first_name %}
-                                        {{ comentario.autor.username }}
+                                    {% if comentario.autor %}
+                                        {% if comentario.autor.first_name or comentario.autor.last_name %}
+                                            {{ comentario.autor.first_name }} {{ comentario.autor.last_name }}
+                                        {% else %}
+                                            {{ comentario.autor.username }}
+                                        {% endif %}
+                                    {% else %}
+                                        Visitante
                                     {% endif %}
                                 </h6>
                                 <small class="text-muted">
@@ -106,23 +120,32 @@
                                     {{ comentario.criado_em|date:"d/m/Y H:i" }}
                                 </small>
                             </div>
-                            {% if comentario.autor == request.user %}
-                            <div class="d-flex flex-column align-items-end gap-1">
-                                <a href="{% url 'books_tech:update_comentario' comentario.pk %}" class="btn btn-link text-primary p-0" title="Editar comentário">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                                    </svg>
-                                </a>
-                                <form method="post" action="{% url 'books_tech:delete_comentario' comentario.pk %}" style="margin: 0;" onsubmit="return confirm('Tem certeza que deseja deletar este comentário?');">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-link text-danger p-0" title="Deletar comentário">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                                        </svg>
-                                    </button>
-                                </form>
-                            </div>
+                            {% if user.is_authenticated %}
+                                {% if user.is_superuser or comentario.autor == user %}
+                                    {% if perms.books_tech.change_comentario or perms.books_tech.delete_comentario %}
+                                        <div class="d-flex flex-column align-items-end gap-1">
+                                            {% if perms.books_tech.change_comentario %}
+                                                <a href="{% url 'books_tech:update_comentario' comentario.pk %}" class="btn btn-link text-primary p-0" title="Editar comentário">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                                    </svg>
+                                                </a>
+                                            {% endif %}
+
+                                            {% if perms.books_tech.delete_comentario %}
+                                                <form method="post" action="{% url 'books_tech:delete_comentario' comentario.pk %}" style="margin: 0;" onsubmit="return confirm('Tem certeza que deseja deletar este comentário?');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-link text-danger p-0" title="Deletar comentário">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
                             {% endif %}
                         </div>
                         <p class="mb-0">{{ comentario.texto|linebreaks }}</p>
@@ -140,32 +163,67 @@
             </div>
         {% endif %}
 
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil-square me-2" viewBox="0 0 16 16">
-                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                    </svg>
-                    Adicionar Comentário
-                </h5>
-            </div>
-            <div class="card-body">
-                <form method="post" action="{% url 'books_tech:add_comentario' post.pk %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="texto" class="form-label">Seu comentário:</label>
-                        <textarea class="form-control" id="texto" name="texto" rows="4" placeholder="Escreva seu comentário aqui..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send me-1" viewBox="0 0 16 16">
-                            <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+        {% if user.is_authenticated %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil-square me-2" viewBox="0 0 16 16">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
                         </svg>
-                        Enviar Comentário
-                    </button>
-                </form>
+                        Adicionar Comentário
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'books_tech:add_comentario' post.pk %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="texto" class="form-label">Seu comentário:</label>
+                            <textarea class="form-control" id="texto" name="texto" rows="4" placeholder="Escreva seu comentário aqui..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send me-1" viewBox="0 0 16 16">
+                                <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+                            </svg>
+                            Enviar Comentário
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
+        {% else %}
+            {% if allow_anonymous_comments %}
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil-square me-2" viewBox="0 0 16 16">
+                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                            </svg>
+                            Adicionar Comentário
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'books_tech:add_comentario' post.pk %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="texto" class="form-label">Seu comentário:</label>
+                                <textarea class="form-control" id="texto" name="texto" rows="4" placeholder="Escreva seu comentário aqui..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send me-1" viewBox="0 0 16 16">
+                                    <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+                                </svg>
+                                Enviar Comentário
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    Faça <a href="{% url 'books_tech:login' %}">login</a> para comentar.
+                </div>
+            {% endif %}
+        {% endif %}
     </div>
     <hr>
 </div>

@@ -26,17 +26,42 @@
                             <th>Usuário</th> 
                             <th>Nome</th>
                             <th>Email</th>
+                            <th>Papel</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for user in users %}
                         <tr>
-                            <td class="fs-6">{{ user.username }}</td>
+                            <td class="fs-6">
+                                {% if user.is_active %}
+                                <span class="text-success me-2" title="Ativo" aria-label="Ativo">●</span>
+                                {% else %}
+                                <span class="text-secondary me-2" title="Desativado" aria-label="Desativado">●</span>
+                                {% endif %}
+                                {{ user.username }}
+                            </td>
                             <td>{{ user.first_name }} {{ user.last_name }}</td>
                             <td>{{ user.email}}</td>
-                            <th> <a class="btn btn-warning btn-sm" href="{% url 'books_tech:editar_usuario' user.id %}">Editar</a>
-                            <th> <a class="btn btn-danger btn-sm" href="">Remover</a>
+                            <td>{{ user.role_label }}</td>
+                            <td>
+                                <a class="btn btn-warning btn-sm" href="{% url 'books_tech:editar_usuario' user.id %}">Editar</a>
+                                {% if user.is_active %}
+                                    {% if user.id != current_user_id %}
+                                    <form method="post" action="{% url 'books_tech:deluser' user.id %}" class="d-inline" onsubmit="return confirm('Tem certeza que deseja desativar este usuário?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Desativar</button>
+                                    </form>
+                                    {% endif %}
+                                {% else %}
+                                    {% if user.id != current_user_id %}
+                                    <form method="post" action="{% url 'books_tech:activateuser' user.id %}" class="d-inline" onsubmit="return confirm('Tem certeza que deseja ativar este usuário?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">Ativar</button>
+                                    </form>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

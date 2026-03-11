@@ -1,11 +1,12 @@
 from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth.models import Permission, User
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.models import Group, Permission, User
+from django.contrib.auth.views import LoginView, redirect_to_login
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -38,8 +39,7 @@ class FriendlyPermissionRequiredMixin(PermissionRequiredMixin):
         return _redirect_home_with_notice('Você não tem permissão para realizar esta ação.', 'danger')
 
 
-class HomeView(LoginRequiredMixin, ListView):
-    login_url = '/login/'
+class HomeView(ListView):
 
     model = Post
     template_name = 'home.html'
@@ -66,7 +66,6 @@ class HomeView(LoginRequiredMixin, ListView):
         return context
 
 
-@login_required(login_url='/login/')
 def CategoryView(request, category_name):
     from django.utils.text import slugify
 
@@ -86,11 +85,15 @@ def CategoryView(request, category_name):
     return render(request, '404.html', status=404)
 
 
-class PostDetailView(LoginRequiredMixin, DetailView):
+class PostDetailView(DetailView):
     model = Post
     template_name = 'post_detail.html'
     context_object_name = 'post'
-    login_url = '/login/'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['allow_anonymous_comments'] = bool(getattr(settings, 'ALLOW_ANONYMOUS_COMMENTS', False))
+        return context
 
     def get(self, request, *args, **kwargs):
         from django.http import Http404
@@ -127,7 +130,7 @@ class PostUpdateView(LoginRequiredMixin, FriendlyPermissionRequiredMixin, Update
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
 
-        if obj.autor != self.request.user:
+        if obj.autor != self.request.user and not self.request.user.is_superuser:
             messages.error(self.request, 'Você não tem permissão para editar este post.')
             return None
 
@@ -148,7 +151,7 @@ def delete_post_direct(request, pk):
         return _redirect_home_with_notice('Você não tem permissão para apagar posts.', 'danger')
 
     post = get_object_or_404(Post, pk=pk)
-    if post.autor != request.user:
+    if post.autor != request.user and not request.user.is_superuser:
         return _redirect_home_with_notice('Você não tem permissão para apagar este post (apenas o autor pode).', 'danger')
 
     post.delete()
@@ -166,66 +169,104 @@ class CustomLoginView(LoginView):
 
 @login_required(login_url='/login/')
 def admin_panel(request):
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return _redirect_home_with_notice('Você não tem permissão para acessar o painel administrativo.', 'danger')
 
+    users = list(User.objects.all().prefetch_related('groups').order_by('username'))
+    for u in users:
+        if u.is_superuser:
+            u.role_label = 'Administrador'
+            continue
+
+        group_names = {g.name for g in u.groups.all()}
+        if 'Autor' in group_names:
+            u.role_label = 'Autor'
+        elif 'Leitor' in group_names:
+            u.role_label = 'Leitor'
+        else:
+            # Papel padrão (fallback seguro para usuários antigos sem grupo).
+            u.role_label = 'Leitor'
+
+    role_order = {
+        'Administrador': 0,
+        'Autor': 1,
+        'Leitor': 2,
+    }
+
+    def _sort_key(user: User):
+        is_current_user = 0 if user.id == request.user.id else 1
+        is_admin = 0 if user.is_superuser else 1
+        role_rank = role_order.get(getattr(user, 'role_label', ''), 99)
+        return (is_current_user, is_admin, role_rank, (user.username or '').lower())
+
+    users.sort(key=_sort_key)
+
     context = {
-        'users': User.objects.all().order_by('username')
+        'users': users,
+        'current_user_id': request.user.id,
     }
     return render(request, 'painel_admin.html', context)
 
 
 @login_required(login_url='/login/')
 def editarusuario(request, id):
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return _redirect_home_with_notice('Você não tem permissão para editar usuários.', 'danger')
 
     usuario = get_object_or_404(User, id=id)
 
-    def _get_perms(app_label: str, model: str, codenames: list[str]):
-        qs = Permission.objects.select_related('content_type').filter(
-            content_type__app_label=app_label,
-            content_type__model=model,
-            codename__in=codenames,
-        )
-        perms_by_codename = {p.codename: p for p in qs}
-        return [perms_by_codename.get(c) for c in codenames if perms_by_codename.get(c)]
+    # Papéis (grupos)
+    leitor_group, _ = Group.objects.get_or_create(name='Leitor')
+    autor_group, _ = Group.objects.get_or_create(name='Autor')
 
-    permission_groups = [
-        {
-            'key': 'post',
-            'label': 'Posts',
-            'perms': _get_perms('books_tech', 'post', ['add_post', 'change_post', 'delete_post', 'view_post']),
-        },
-        {
-            'key': 'comentario',
-            'label': 'Comentários',
-            'perms': _get_perms('books_tech', 'comentario', ['add_comentario', 'change_comentario', 'delete_comentario', 'view_comentario']),
-        },
-        {
-            'key': 'categoria',
-            'label': 'Categorias',
-            'perms': _get_perms('books_tech', 'categoria', ['add_categoria', 'change_categoria', 'delete_categoria', 'view_categoria']),
-        },
-        {
-            'key': 'perfilautor',
-            'label': 'Perfil do Autor',
-            'perms': _get_perms('books_tech', 'perfilautor', ['add_perfilautor', 'change_perfilautor', 'delete_perfilautor', 'view_perfilautor']),
-        },
-        {
-            'key': 'usuario',
-            'label': 'Usuários',
-            'perms': _get_perms('auth', 'user', ['add_user', 'change_user', 'delete_user', 'view_user']),
-        },
-    ]
+    if usuario.groups.filter(id=autor_group.id).exists():
+        current_role = 'Autor'
+    elif usuario.groups.filter(id=leitor_group.id).exists():
+        current_role = 'Leitor'
+    else:
+        current_role = 'Leitor'
 
-    managed_permission_ids = {p.id for g in permission_groups for p in g['perms']}
+    all_permissions = Permission.objects.select_related('content_type').order_by(
+        'content_type__app_label',
+        'content_type__model',
+        'codename',
+    )
+
+    permission_groups = []
+    current_key = None
+    current_group = None
+    for perm in all_permissions:
+        ct = perm.content_type
+        key = f'{ct.app_label}.{ct.model}'
+        if key != current_key:
+            current_key = key
+            current_group = {
+                'key': key,
+                'label': f'{ct.app_label} / {ct.model}',
+                'perms': [],
+            }
+            permission_groups.append(current_group)
+
+        current_group['perms'].append(perm)
+
     assigned_permission_ids = set(usuario.user_permissions.values_list('id', flat=True))
 
     if request.method == 'POST':
+        posted_role = (request.POST.get('role') or '').strip()
+        if posted_role in {'Leitor', 'Autor'}:
+            current_role = posted_role
+
         form = UsuarioForm(request.POST, instance=usuario)
         if form.is_valid():
             usuario_atualizado = form.save()
+
+            selected_role = (request.POST.get('role') or '').strip()
+            if selected_role == 'Autor':
+                usuario_atualizado.groups.add(autor_group)
+                usuario_atualizado.groups.remove(leitor_group)
+            else:
+                usuario_atualizado.groups.add(leitor_group)
+                usuario_atualizado.groups.remove(autor_group)
 
             selected_permission_ids = request.POST.getlist('permissions')
             try:
@@ -233,12 +274,7 @@ def editarusuario(request, id):
             except (TypeError, ValueError):
                 selected_permission_ids = []
 
-            # Aplica somente o subconjunto gerenciado (não apaga permissões fora do escopo).
-            selected_ids_set = set(selected_permission_ids)
-            preserved_ids = assigned_permission_ids - managed_permission_ids
-            final_ids = preserved_ids | (selected_ids_set & managed_permission_ids)
-
-            selected_permissions = Permission.objects.filter(id__in=final_ids)
+            selected_permissions = Permission.objects.filter(id__in=selected_permission_ids)
             usuario_atualizado.user_permissions.set(selected_permissions)
 
             messages.success(request, 'Usuário atualizado com sucesso!')
@@ -251,11 +287,66 @@ def editarusuario(request, id):
     context = {
         'formUsuario': form,
         'id': id,
+        'current_role': current_role,
         'permission_groups': permission_groups,
-        'assigned_permission_ids': sorted(assigned_permission_ids),
+        'assigned_permission_ids': assigned_permission_ids,
         'usuario': usuario,
     }
     return render(request, 'editar_usuario.html', context)
+
+
+@login_required(login_url='/login/')
+def deluser(request, id):
+    if not request.user.is_superuser:
+        return _redirect_home_with_notice('Você não tem permissão para gerenciar usuários.', 'danger')
+
+    if request.method != 'POST':
+        return redirect('books_tech:admin_panel')
+
+    usuario = get_object_or_404(User, id=id)
+
+    if usuario == request.user:
+        messages.error(request, 'Você não pode desativar seu próprio usuário.')
+        return redirect('books_tech:admin_panel')
+
+    if usuario.is_superuser and User.objects.filter(is_superuser=True, is_active=True).count() <= 1:
+        messages.error(request, 'Você não pode desativar o último administrador do sistema.')
+        return redirect('books_tech:admin_panel')
+
+    if not usuario.is_active:
+        messages.info(request, 'Este usuário já está inativo.')
+        return redirect('books_tech:admin_panel')
+
+    usuario.is_active = False
+    usuario.save(update_fields=['is_active'])
+
+    messages.success(request, 'Usuário desativado com sucesso!')
+    return redirect('books_tech:admin_panel')
+
+
+@login_required(login_url='/login/')
+def activateuser(request, id):
+    if not request.user.is_superuser:
+        return _redirect_home_with_notice('Você não tem permissão para gerenciar usuários.', 'danger')
+
+    if request.method != 'POST':
+        return redirect('books_tech:admin_panel')
+
+    usuario = get_object_or_404(User, id=id)
+
+    if usuario == request.user:
+        messages.error(request, 'Você não pode alterar o status do seu próprio usuário.')
+        return redirect('books_tech:admin_panel')
+
+    if usuario.is_active:
+        messages.info(request, 'Este usuário já está ativo.')
+        return redirect('books_tech:admin_panel')
+
+    usuario.is_active = True
+    usuario.save(update_fields=['is_active'])
+
+    messages.success(request, 'Usuário ativado com sucesso!')
+    return redirect('books_tech:admin_panel')
 
 
 class CategoriaCreateView(LoginRequiredMixin, FriendlyPermissionRequiredMixin, CreateView):
@@ -361,26 +452,37 @@ def perfil_autor_redirect(request):
     return redirect('edit_profile')
 
 
-class AddComentarioView(LoginRequiredMixin, FriendlyPermissionRequiredMixin, CreateView):
+class AddComentarioView(CreateView):
     model = Comentario
     form_class = ComentarioForm
     template_name = 'post_detail.html'
     login_url = '/login/'
-    permission_required = 'books_tech.add_comentario'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Esta view existe apenas para POST do formulário de comentário.
+        if request.method != 'POST':
+            return redirect('books_tech:post_detail', pk=kwargs.get('post_id'))
+
+        if not request.user.is_authenticated and not bool(
+            getattr(settings, 'ALLOW_ANONYMOUS_COMMENTS', False)
+        ):
+            return redirect_to_login(request.get_full_path(), login_url=self.login_url)
+
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        form.instance.autor = self.request.user
+        if self.request.user.is_authenticated:
+            form.instance.autor = self.request.user
+        else:
+            form.instance.autor = None
         form.instance.post_id = self.kwargs['post_id']
         return super().form_valid(form)
 
     def get_success_url(self):
         return self.object.post.get_absolute_url()
 
-    def handle_no_permission(self):
-        if not self.request.user.is_authenticated:
-            return super().handle_no_permission()
-
-        messages.error(self.request, 'Você não tem permissão para comentar.')
+    def form_invalid(self, form):
+        messages.error(self.request, 'Não foi possível adicionar o comentário. Verifique o texto informado.')
         return redirect('books_tech:post_detail', pk=self.kwargs.get('post_id'))
 
 
@@ -394,7 +496,7 @@ class ComentarioDeleteView(LoginRequiredMixin, FriendlyPermissionRequiredMixin, 
 
     def get_object(self, queryset=None):
         comentario = super().get_object(queryset)
-        if comentario.autor != self.request.user:
+        if comentario.autor != self.request.user and not self.request.user.is_superuser:
             messages.error(self.request, 'Você não tem permissão para deletar este comentário.')
             return None
         return comentario
@@ -430,7 +532,7 @@ class ComentarioUpdateView(LoginRequiredMixin, FriendlyPermissionRequiredMixin, 
 
     def get_object(self, queryset=None):
         comentario = super().get_object(queryset)
-        if comentario.autor != self.request.user:
+        if comentario.autor != self.request.user and not self.request.user.is_superuser:
             messages.error(self.request, 'Você não tem permissão para editar este comentário.')
             return None
         return comentario

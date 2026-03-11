@@ -32,14 +32,14 @@ ALLOWED_HOSTS = ['micaelrosario.pythonanywhere.com', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'books_tech',  # custom user model app needs to load before auth/admin
+    'books_tech.apps.BooksTechConfig',  # papéis (grupos) e permissões padrão
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "members",
+    "members.apps.MembersConfig",
 ]
 
 # Use default Django User model (auth.User)
@@ -180,6 +180,10 @@ if GMAIL_USER and GMAIL_APP_PASSWORD:
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 LOGIN_URL = 'books_tech:login'
+
+# Comentários de visitante (opcional).
+# Se True, visitantes (não logados) podem enviar comentários.
+ALLOW_ANONYMOUS_COMMENTS = False
 
 # Mapeamento de tags de mensagens do Django para classes do Bootstrap
 from django.contrib.messages import constants as messages

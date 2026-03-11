@@ -1,16 +1,17 @@
-from django.contrib.auth.models import User
-from django.test import TestCase
+from django.contrib.auth.models import Permission, User
+from django.test import TestCase, override_settings
 from django.urls import reverse
-from django.contrib.auth.models import Permission
+from django.utils.text import slugify
+
+from .models import Categoria, Comentario, Post
 
 
 class EditarUsuarioTests(TestCase):
 	def setUp(self):
-		self.staff = User.objects.create_user(
+		self.staff = User.objects.create_superuser(
 			username='admin_staff',
-			password='senha_admin_123',
 			email='admin@example.com',
-			is_staff=True,
+			password='senha_admin_123',
 		)
 		self.usuario = User.objects.create_user(
 			username='usuario_teste',
@@ -140,3 +141,129 @@ class EditarUsuarioTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.usuario.refresh_from_db()
 		self.assertTrue(self.usuario.has_perm('auth.change_user'))
+
+
+class DelUserTests(TestCase):
+	def setUp(self):
+		self.staff = User.objects.create_superuser(
+			username='admin_staff',
+			email='admin@example.com',
+			password='senha_admin_123',
+		)
+		self.usuario = User.objects.create_user(
+			username='usuario_teste',
+			password='senha_usuario_123',
+			email='usuario@example.com',
+		)
+
+	def test_staff_pode_desativar_usuario(self):
+		self.client.force_login(self.staff)
+		url = reverse('books_tech:deluser', args=[self.usuario.id])
+		response = self.client.post(url, follow=True)
+
+		self.assertEqual(response.status_code, 200)
+		self.usuario.refresh_from_db()
+		self.assertFalse(self.usuario.is_active)
+
+	def test_nao_staff_nao_pode_desativar_usuario(self):
+		self.client.force_login(self.usuario)
+		url = reverse('books_tech:deluser', args=[self.staff.id])
+		response = self.client.post(url)
+
+		self.assertEqual(response.status_code, 302)
+		self.assertIn('notice=', response.url)
+
+	def test_staff_nao_pode_desativar_o_proprio_usuario(self):
+		self.client.force_login(self.staff)
+		url = reverse('books_tech:deluser', args=[self.staff.id])
+		response = self.client.post(url, follow=True)
+
+		self.assertEqual(response.status_code, 200)
+		self.staff.refresh_from_db()
+		self.assertTrue(self.staff.is_active)
+
+	def test_staff_pode_ativar_usuario_inativo(self):
+		self.usuario.is_active = False
+		self.usuario.save(update_fields=['is_active'])
+
+		self.client.force_login(self.staff)
+		url = reverse('books_tech:activateuser', args=[self.usuario.id])
+		response = self.client.post(url, follow=True)
+
+		self.assertEqual(response.status_code, 200)
+		self.usuario.refresh_from_db()
+		self.assertTrue(self.usuario.is_active)
+
+	def test_nao_staff_nao_pode_ativar_usuario(self):
+		self.staff.is_active = False
+		self.staff.save(update_fields=['is_active'])
+
+		self.client.force_login(self.usuario)
+		url = reverse('books_tech:activateuser', args=[self.staff.id])
+		response = self.client.post(url)
+
+		self.assertEqual(response.status_code, 302)
+		self.assertIn('notice=', response.url)
+
+
+class VisitanteLeituraTests(TestCase):
+	def setUp(self):
+		self.autor = User.objects.create_user(
+			username='autor',
+			password='senha_autor_123',
+			email='autor@example.com',
+		)
+		self.categoria = Categoria.objects.create(nome='Python e Django')
+		self.post = Post.objects.create(
+			titulo='Post público',
+			autor=self.autor,
+			categoria=self.categoria,
+			conteudo='Conteúdo do post',
+		)
+
+	def test_visitante_pode_ver_home(self):
+		url = reverse('books_tech:home_view')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+
+	def test_visitante_pode_ver_detalhe_post(self):
+		url = reverse('books_tech:post_detail', args=[self.post.id])
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+
+	def test_visitante_pode_ver_posts_por_categoria(self):
+		url = reverse('books_tech:categoria_posts', args=[slugify(self.categoria.nome)])
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+
+	def test_visitante_nao_pode_comentar_quando_desativado(self):
+		url = reverse('books_tech:add_comentario', args=[self.post.id])
+		response = self.client.post(url, {'texto': 'Comentário visitante'})
+		self.assertEqual(response.status_code, 302)
+		self.assertTrue(response.url.startswith('/login/'))
+		self.assertEqual(Comentario.objects.count(), 0)
+
+	def test_leitor_logado_pode_comentar(self):
+		leitor = User.objects.create_user(
+			username='leitor',
+			password='senha_leitor_123',
+			email='leitor@example.com',
+		)
+		self.client.force_login(leitor)
+		url = reverse('books_tech:add_comentario', args=[self.post.id])
+		response = self.client.post(url, {'texto': 'Comentário de leitor logado'}, follow=True)
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(Comentario.objects.count(), 1)
+		comentario = Comentario.objects.get()
+		self.assertEqual(comentario.post, self.post)
+		self.assertEqual(comentario.autor, leitor)
+
+	@override_settings(ALLOW_ANONYMOUS_COMMENTS=True)
+	def test_visitante_pode_comentar_quando_ativado(self):
+		url = reverse('books_tech:add_comentario', args=[self.post.id])
+		response = self.client.post(url, {'texto': 'Comentário visitante'}, follow=True)
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(Comentario.objects.count(), 1)
+		comentario = Comentario.objects.get()
+		self.assertEqual(comentario.post, self.post)
+		self.assertIsNone(comentario.autor)

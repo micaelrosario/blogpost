@@ -44,12 +44,13 @@ class Categoria(models.Model):
 
 class Comentario(models.Model):
     post = models.ForeignKey(Post, related_name='comentarios', on_delete=models.CASCADE)
-    autor = models.ForeignKey(User, on_delete=models.CASCADE)
+    autor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     texto = models.TextField()
     criado_em = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return '%s - %s' % (self.post.titulo, self.autor.username)
+        autor_label = self.autor.username if self.autor else 'Visitante'
+        return '%s - %s' % (self.post.titulo, autor_label)
 
 
 class PerfilAutor(models.Model):

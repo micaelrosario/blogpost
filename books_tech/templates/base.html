@@ -26,12 +26,16 @@
             <!-- Itens da esquerda -->
             {% if user.is_authenticated %}
             <ul class="navbar-nav mx-4">
+                {% if perms.books_tech.add_post %}
                 <li class="nav-item active">
                     <a class="nav-link" href="{% url 'books_tech:add_post' %}">Nova Postagem</a>
                 </li>
+                {% endif %}
+                {% if perms.books_tech.add_categoria %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'books_tech:add_categoria' %}">Nova Categoria</a>
                 </li>
+                {% endif %}
             </ul>
             {% else %}
             <ul class="navbar-nav mx-4">

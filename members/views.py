@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -16,6 +17,15 @@ class UserRegisterView(generic.CreateView):
     form_class = UserCreationForm
     template_name = 'registration/register.html'
     success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        # Papel padrão: todo usuário registrado começa como "Leitor".
+        leitor_group, _ = Group.objects.get_or_create(name='Leitor')
+        self.object.groups.add(leitor_group)
+
+        return response
 
 
 class UserEditView(LoginRequiredMixin, View):
