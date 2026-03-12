@@ -169,7 +169,7 @@ class CustomLoginView(LoginView):
 
 @login_required(login_url='/login/')
 def admin_panel(request):
-    if not request.user.is_superuser:
+    if not request.user.has_perm('auth.change_user'):
         return _redirect_home_with_notice('Você não tem permissão para acessar o painel administrativo.', 'danger')
 
     users = list(User.objects.all().prefetch_related('groups').order_by('username'))
@@ -210,7 +210,7 @@ def admin_panel(request):
 
 @login_required(login_url='/login/')
 def editarusuario(request, id):
-    if not request.user.is_superuser:
+    if not request.user.has_perm('auth.change_user'):
         return _redirect_home_with_notice('Você não tem permissão para editar usuários.', 'danger')
 
     usuario = get_object_or_404(User, id=id)
@@ -297,7 +297,7 @@ def editarusuario(request, id):
 
 @login_required(login_url='/login/')
 def deluser(request, id):
-    if not request.user.is_superuser:
+    if not request.user.has_perm('auth.change_user'):
         return _redirect_home_with_notice('Você não tem permissão para gerenciar usuários.', 'danger')
 
     if request.method != 'POST':
@@ -326,7 +326,7 @@ def deluser(request, id):
 
 @login_required(login_url='/login/')
 def activateuser(request, id):
-    if not request.user.is_superuser:
+    if not request.user.has_perm('auth.change_user'):
         return _redirect_home_with_notice('Você não tem permissão para gerenciar usuários.', 'danger')
 
     if request.method != 'POST':

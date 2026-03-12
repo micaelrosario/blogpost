@@ -94,7 +94,7 @@ class PerfilAutorForm(forms.ModelForm):
             'redes_sociais': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Cole uma URL por linha\nhttps://instagram.com/seuusuario\nhttps://github.com/seuusuario'
+                'placeholder': 'Cole uma URL por linha\nhttps://instagram.com/seu-usuario\nhttps://github.com/seuusuario'
             }),
         }
 

@@ -53,7 +53,7 @@
                 </li>
 
                 <li>
-                    {% if user.is_superuser %}
+                    {% if perms.auth.change_user %}
                     <a class="nav-link me-5" href="{% url 'books_tech:admin_panel' %}">
                         Admin
                     </a>

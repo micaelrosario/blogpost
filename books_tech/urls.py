@@ -22,8 +22,6 @@ urlpatterns = [
     path('categoria/<str:category_name>/', CategoryView, name='categoria_posts'),
     path('painel/', admin_panel, name='admin_panel'),
     path('editarusuario/id/<int:id>/', editarusuario, name='editar_usuario'),
-    path('deluser/id/<int:id>/', deluser, name='deluser'),
-    path('activateuser/id/<int:id>/', activateuser, name='activateuser'),
-    #path('excluirusuario/id/<int:pk>/', excluirusuario, name='excluir_usuario'),
-
+    path('desativaruser/id/<int:id>/', deluser, name='deluser'),
+    path('ativaruser/id/<int:id>/', activateuser, name='activateuser'),
 ]

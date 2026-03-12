@@ -76,8 +76,6 @@
                         {% endif %} <br>
                         {{ post.titulo }}</a>{% if post.categoria %} -
                         <a href="{% url 'books_tech:categoria_posts' post.categoria.nome|slugify %}">{{post.categoria.nome}}</a>{% endif %} <br>
-                        <!--a href="">
-                        </a--> 
                             {{ post.autor.first_name}} 
                             {{ post.autor.last_name}} 
                         <br>
